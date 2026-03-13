@@ -1,0 +1,74 @@
+{
+    "config": {
+        "error": {
+            "date_in_future": "Date cannot be in the future",
+            "duplicate_name": "A reminder with this name already exists",
+            "invalid_date": "Invalid date format \u2014 use YYYY-MM-DD",
+            "invalid_interval": "Interval must be at least 1 day",
+            "name_empty": "Name cannot be empty",
+            "unknown": "Unexpected error"
+        },
+        "step": {
+            "reconfigure": {
+                "data": {
+                    "interval": "Interval (days)",
+                    "last_changed": "Last Changed",
+                    "name": "Name"
+                },
+                "data_description": {
+                    "interval": "How often this reminder repeats, in days",
+                    "last_changed": "The date this reminder was last completed",
+                    "name": "A label for this reminder"
+                }
+            },
+            "user": {
+                "data": {
+                    "interval": "Interval (days)",
+                    "last_changed": "Last Changed",
+                    "name": "Name"
+                },
+                "data_description": {
+                    "interval": "How often this reminder repeats, in days",
+                    "last_changed": "The date this reminder was last completed",
+                    "name": "A label for this reminder"
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "reminder": {
+                "name": "Reminder"
+            }
+        }
+    },
+    "options": {
+        "error": {
+            "date_in_future": "Date cannot be in the future",
+            "invalid_date": "Invalid date format \u2014 use YYYY-MM-DD",
+            "invalid_interval": "Interval must be at least 1 day",
+            "name_empty": "Name cannot be empty",
+            "unknown": "Unexpected error"
+        },
+        "step": {
+            "init": {
+                "data": {
+                    "interval": "Interval (days)",
+                    "last_changed": "Last Changed",
+                    "name": "Name"
+                },
+                "data_description": {
+                    "interval": "How often this reminder repeats, in days",
+                    "last_changed": "The date this reminder was last completed",
+                    "name": "A label for this reminder"
+                }
+            }
+        }
+    },
+    "services": {
+        "mark_done": {
+            "description": "Reset a reminder's last changed date to today.",
+            "name": "Mark Done"
+        }
+    }
+}

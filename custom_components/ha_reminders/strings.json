@@ -1,0 +1,77 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "name": "Name",
+          "last_changed": "Last Changed",
+          "interval": "Interval (days)"
+        },
+        "data_description": {
+          "name": "A label for this reminder",
+          "last_changed": "The date this reminder was last completed",
+          "interval": "How often this reminder repeats, in days"
+        }
+      },
+      "reconfigure": {
+        "data": {
+          "name": "Name",
+          "last_changed": "Last Changed",
+          "interval": "Interval (days)"
+        },
+        "data_description": {
+          "name": "A label for this reminder",
+          "last_changed": "The date this reminder was last completed",
+          "interval": "How often this reminder repeats, in days"
+        }
+      }
+    },
+    "error": {
+      "date_in_future": "Date cannot be in the future",
+      "duplicate_name": "A reminder with this name already exists",
+      "invalid_date": "Invalid date format — use YYYY-MM-DD",
+      "invalid_interval": "Interval must be at least 1 day",
+      "name_empty": "Name cannot be empty",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
+    }
+  },
+
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "name": "Name",
+          "last_changed": "Last Changed",
+          "interval": "Interval (days)"
+        },
+        "data_description": {
+          "name": "A label for this reminder",
+          "last_changed": "The date this reminder was last completed",
+          "interval": "How often this reminder repeats, in days"
+        }
+      }
+    },
+    "error": {
+      "date_in_future": "Date cannot be in the future",
+      "invalid_date": "Invalid date format — use YYYY-MM-DD",
+      "invalid_interval": "Interval must be at least 1 day",
+      "name_empty": "Name cannot be empty",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
+    }
+  },
+
+  "entity": {
+    "sensor": {
+      "reminder": {
+        "name": "Reminder"
+      }
+    }
+  },
+
+  "services": {
+    "mark_done": {
+      "name": "Mark Done",
+      "description": "Reset a reminder's last changed date to today."
+    }
+  }
+}

@@ -1,0 +1,119 @@
+rules:
+  # Bronze
+  action-setup:
+    status: exempt
+    comment: >-
+      This integration registers only an entity service via
+      platform.async_register_entity_service, which must be registered during
+      platform setup (async_setup_entry). It does not register any domain-level
+      services via hass.services.async_register.
+  appropriate-polling:
+    status: exempt
+    comment: This integration doesn't do any polling, it is purely calculated data
+  brands:
+    status: exempt
+    comment: This is a custom integration, not submitted to HA core
+  common-modules: done
+  config-flow-test-coverage: done
+  config-flow: done
+  dependency-transparency:
+    status: exempt
+    comment: This integration has no external dependencies
+  docs-actions: done
+  docs-high-level-description: done
+  docs-installation-instructions: done
+  docs-removal-instructions: done
+  entity-event-setup:
+    status: exempt
+    comment: This integration doesn't use event based updates
+  entity-unique-id: done
+  has-entity-name: done
+  runtime-data: done
+  test-before-configure:
+    status: exempt
+    comment: This integration doesn't connect externally
+  test-before-setup:
+    status: exempt
+    comment: This integration doesn't connect externally
+  unique-config-entry:
+    status: exempt
+    comment: >-
+      Each config entry is one reminder. Duplicate names are
+      rejected in the config flow via the existing_names check.
+
+
+  # Silver
+  action-exceptions: done
+  config-entry-unloading: done
+  docs-configuration-parameters:
+    status: exempt
+    comment: No configuration parameters beyond the config flow fields
+  docs-installation-parameters:
+    status: exempt
+    comment: No installation parameters required
+  entity-unavailable:
+    status: exempt
+    comment: Entities are always available — state is computed from config entry data with no external dependency
+  integration-owner: done
+  log-when-unavailable:
+    status: exempt
+    comment: Entities are never unavailable
+  parallel-updates: done
+  reauthentication-flow:
+    status: exempt
+    comment: no credentials to reauth
+  test-coverage: done
+
+  # Gold
+  devices:
+    status: exempt
+    comment: helper integration, no device
+  diagnostics:
+    status: exempt
+    comment: no devices to diagnose
+  discovery-update-info:
+    status: exempt
+    comment: no device discovery mechanism
+  discovery:
+    status: exempt
+    comment: no device discovery mechanism
+  docs-data-update: done
+  docs-examples: done
+  docs-known-limitations: done
+  docs-supported-devices:
+    status: exempt
+    comment:  it's a service/helper, not a device integration
+  docs-supported-functions: done
+  docs-troubleshooting: done
+  docs-use-cases: done
+  dynamic-devices:
+    status: exempt
+    comment: reminders are added only via config flow, not discovered at runtime
+  entity-category: done
+  entity-device-class:
+    status: exempt
+    comment: no SensorDeviceClass fits a "days until" reminder sensor
+  entity-disabled-by-default: done
+  entity-translations: done
+  exception-translations:
+    status: exempt
+    comment: >-
+      The only service action (mark_done) mutates config entry data and raises
+      no user-facing HomeAssistantError; there are no translatable exceptions.
+  icon-translations: done
+  reconfiguration-flow: done
+  repair-issues:
+    status: exempt
+    comment: no repair flows needed
+  stale-devices:
+    status: exempt
+    comment: devices are 1:1 with config entries; removing the entry removes the device
+
+  # Platinum
+  async-dependency:
+    status: exempt
+    comment: This integrations doesn't use asyncio
+  inject-websession:
+    status: exempt
+    comment: This integration doesn't connect to any http server
+  strict-typing: done

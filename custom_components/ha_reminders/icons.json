@@ -1,0 +1,14 @@
+{
+  "entity": {
+    "sensor": {
+      "reminder": {
+        "default": "mdi:bell"
+      }
+    }
+  },
+  "services": {
+    "mark_done": {
+      "service": "mdi:check-circle"
+    }
+  }
+}

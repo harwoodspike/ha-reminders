@@ -1,0 +1,14 @@
+{
+  "domain": "ha_reminders",
+  "name": "HA Reminders",
+  "codeowners": [
+    "@harwoodspike"
+  ],
+  "config_flow": true,
+  "dependencies": ["frontend", "http"],
+  "documentation": "https://github.com/harwoodspike/ha-reminders",
+  "iot_class": "calculated",
+  "quality_scale": "platinum",
+  "requirements": [],
+  "version": "1.0.0"
+}
