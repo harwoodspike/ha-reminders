@@ -1,4 +1,4 @@
-# HA Reminders
+# HA Reminders (HACS integration for Home Assistant)
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/release/harwoodspike/ha-reminders.svg)](https://github.com/harwoodspike/ha-reminders/releases)
