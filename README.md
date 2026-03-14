@@ -1,4 +1,4 @@
-# HA Reminders (HACS integration for Home Assistant)
+# HA Reminders
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/release/harwoodspike/ha-reminders.svg)](https://github.com/harwoodspike/ha-reminders/releases)
@@ -90,17 +90,15 @@ Resets a reminder's `last_changed` date to today, restarting the interval countd
 
 | Parameter | Required | Description |
 |---|---|---|
-| `entry_id` | Yes | The config entry ID of the reminder to reset |
+| `entity_id` | Yes | The entity ID of the reminder sensor to reset |
 
 ### Example
 
 ```yaml
 service: ha_reminders.mark_done
 data:
-  entry_id: "abc123def456"
+  entity_id: sensor.change_hvac_filter
 ```
-
-You can find the `entry_id` in **Settings → Devices & Services → HA Reminders** → click the reminder → the URL contains the entry ID.
 
 ---
 
@@ -131,7 +129,7 @@ automation:
     action:
       - service: ha_reminders.mark_done
         data:
-          entry_id: "abc123def456"
+          entity_id: sensor.change_hvac_filter
 ```
 
 ---
