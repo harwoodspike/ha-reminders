@@ -6,7 +6,6 @@ from datetime import date
 import logging
 from pathlib import Path
 
-from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STARTED, Platform
@@ -49,8 +48,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     await hass.http.async_register_static_paths(
         [StaticPathConfig(_CARD_URL, str(_CARD_PATH), cache_headers=False)]
     )
-    add_extra_js_url(hass, _CARD_URL)
-
     async def _on_ha_started(_event: Event) -> None:
         await _async_register_lovelace_resource(hass)
 
