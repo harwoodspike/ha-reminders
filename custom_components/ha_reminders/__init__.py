@@ -9,8 +9,8 @@ from pathlib import Path
 from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from homeassistant.const import EVENT_HOMEASSISTANT_STARTED, Platform
+from homeassistant.core import Event, HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
@@ -29,21 +29,19 @@ async def _async_register_lovelace_resource(hass: HomeAssistant) -> None:
     try:
         lovelace = hass.data.get("lovelace")
         if lovelace is None:
+            _LOGGER.warning("ha-reminders: lovelace not found in hass.data")
             return
         resources = lovelace.get("resources")
         if resources is None:
+            _LOGGER.warning("ha-reminders: lovelace resources not found")
             return
         await resources.async_load(True)
         if any(r.get("url") == _CARD_URL for r in resources.async_items()):
             return
         await resources.async_create_item({"res_type": "module", "url": _CARD_URL})
-        _LOGGER.debug("Registered ha-reminders-card as Lovelace resource")
+        _LOGGER.info("Registered ha-reminders-card as Lovelace resource")
     except Exception:  # noqa: BLE001
-        _LOGGER.warning(
-            "Could not auto-register ha-reminders-card as a Lovelace resource. "
-            "If the card is missing, add %s manually via Settings > Dashboards > Resources.",
-            _CARD_URL,
-        )
+        _LOGGER.exception("ha-reminders: failed to register Lovelace resource")
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
@@ -52,7 +50,11 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         [StaticPathConfig(_CARD_URL, str(_CARD_PATH), cache_headers=False)]
     )
     add_extra_js_url(hass, _CARD_URL)
-    hass.async_create_task(_async_register_lovelace_resource(hass))
+
+    async def _on_ha_started(_event: Event) -> None:
+        await _async_register_lovelace_resource(hass)
+
+    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _on_ha_started)
     return True
 
 
