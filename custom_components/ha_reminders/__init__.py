@@ -35,7 +35,7 @@ async def _async_register_lovelace_resource(hass: HomeAssistant) -> None:
         if resources is None:
             _LOGGER.warning("ha-reminders: lovelace resources not found")
             return
-        await resources.async_load(True)
+        await resources.async_load()
         if any(r.get("url") == _CARD_URL for r in resources.async_items()):
             return
         await resources.async_create_item({"res_type": "module", "url": _CARD_URL})
