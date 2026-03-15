@@ -31,7 +31,7 @@ async def _async_register_lovelace_resource(hass: HomeAssistant) -> None:
         if lovelace is None:
             _LOGGER.warning("ha-reminders: lovelace not found in hass.data")
             return
-        resources = lovelace.get("resources")
+        resources = getattr(lovelace, "resources", None)
         if resources is None:
             _LOGGER.warning("ha-reminders: lovelace resources not found")
             return
