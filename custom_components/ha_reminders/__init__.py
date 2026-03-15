@@ -24,12 +24,35 @@ _CARD_URL = "/ha_reminders/ha-reminders-card.js"
 _CARD_PATH = Path(__file__).parent / "ha-reminders-card.js"
 
 
+async def _async_register_lovelace_resource(hass: HomeAssistant) -> None:
+    """Add the card to Lovelace's resource registry if not already present."""
+    try:
+        lovelace = hass.data.get("lovelace")
+        if lovelace is None:
+            return
+        resources = lovelace.get("resources")
+        if resources is None:
+            return
+        await resources.async_load(True)
+        if any(r.get("url") == _CARD_URL for r in resources.async_items()):
+            return
+        await resources.async_create_item({"res_type": "module", "url": _CARD_URL})
+        _LOGGER.debug("Registered ha-reminders-card as Lovelace resource")
+    except Exception:  # noqa: BLE001
+        _LOGGER.warning(
+            "Could not auto-register ha-reminders-card as a Lovelace resource. "
+            "If the card is missing, add %s manually via Settings > Dashboards > Resources.",
+            _CARD_URL,
+        )
+
+
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Register the custom Lovelace card as a frontend resource."""
     await hass.http.async_register_static_paths(
         [StaticPathConfig(_CARD_URL, str(_CARD_PATH), cache_headers=False)]
     )
     add_extra_js_url(hass, _CARD_URL)
+    hass.async_create_task(_async_register_lovelace_resource(hass))
     return True
 
 
