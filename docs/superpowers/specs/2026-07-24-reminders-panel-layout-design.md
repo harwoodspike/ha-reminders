@@ -79,11 +79,13 @@ A full-width `<table>`. Columns: **Name** (always) · **Status** (badge) · **Du
 
 ### Status badge (shared)
 
-A small pill. Two states driven by `is_overdue`:
-- Overdue → background/text from `--error-color` (fallback `#db4437`).
-- Not Due → from `--success-color` (fallback `#43a047`).
+A small rounded chip with a **soft-tinted** background (the HA state-badge look), two states driven by `is_overdue`:
+- Overdue → color `--error-color` (fallback `#db4437`).
+- Not Due → color `--success-color` (fallback `#43a047`).
 
-Rendered as a rounded chip with contrasting text; used in both the card header and the table Status cell via one `_statusBadge(attrs)` helper (DRY).
+The chip uses the saturated color as its **text** color and a ~12%-opacity version of that color as its **background** (pale tint), not a solid fill. Achieve the tint theme-awarely with `background: color-mix(in srgb, <color> 12%, transparent)` and `color: <color>`, where `<color>` is the theme variable above. `color-mix` is supported by the evergreen browsers HA targets; the variable fallbacks cover the default palette. Styling: `border-radius` pill (e.g. `999px`), small horizontal padding, `font-size` ~0.75em, `font-weight` 500.
+
+Rendered via one `_statusBadge(attrs)` helper used in both the card header and the table Status cell (DRY).
 
 ## State Persistence
 
