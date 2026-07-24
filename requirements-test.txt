@@ -1,0 +1,21 @@
+# Test dependencies for running the HA Reminders test suite locally.
+#
+# Setup:
+#   python3 -m venv .venv
+#   source .venv/bin/activate
+#   pip install -r requirements-test.txt
+#
+# Run:
+#   pytest tests/components/ha_reminders/ -v
+#
+# pytest-homeassistant-custom-component bundles a matching Home Assistant and
+# the test fixtures (hass, MockConfigEntry, enable_custom_integrations), so the
+# suite runs on a plain venv with no Docker or home-assistant/core checkout.
+pytest-homeassistant-custom-component==0.13.236
+
+# The integration depends on the `frontend` component (it registers a sidebar
+# panel), so tests that set up an entry need the real frontend package. This pin
+# must match the version the bundled Home Assistant expects — see
+# homeassistant/components/frontend/manifest.json in the installed HA. Bump it
+# together with pytest-homeassistant-custom-component.
+home-assistant-frontend==20250411.0

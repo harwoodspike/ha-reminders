@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 
 from homeassistant.core import HomeAssistant
-from tests.common import MockConfigEntry  # noqa: TID251
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 DOMAIN = "ha_reminders"
 

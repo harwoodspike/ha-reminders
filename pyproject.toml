@@ -1,0 +1,9 @@
+[tool.pytest.ini_options]
+# pytest-homeassistant-custom-component provides an async `hass` fixture, which
+# requires pytest-asyncio's auto mode to be resolved (Home Assistant core sets
+# this too). Without it, fixtures arrive as un-awaited async generators.
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+# Make the repo root importable so tests can `import custom_components.ha_reminders`.
+pythonpath = ["."]

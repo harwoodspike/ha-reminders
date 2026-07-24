@@ -8,7 +8,7 @@ from custom_components.ha_reminders.const import DOMAIN
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
-from tests.common import MockConfigEntry  # noqa: TID251
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 VALID_INPUT = {
     "name": "Air Filter",
