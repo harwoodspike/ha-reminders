@@ -97,7 +97,7 @@ Read once on first `_render` (lazy-init into `state`), written whenever layout o
 
 ## Error / Edge Handling
 
-- Corrupt or missing `localStorage` value → fall back to defaults (grid, all columns on).
+- Corrupt or missing `localStorage` value → fall back to defaults: `layout = grid`, and all **table** columns visible. (Column visibility affects only the table view; the card grid always shows the same fixed card content.)
 - `due_date` / `last_changed` missing on an entity → render an em dash `—` in that cell/line rather than a broken date.
 - `escapeHtml` applied to every user-derived string interpolated into `innerHTML` (fixes the previously-noted self-XSS via reminder names).
 - Empty search + `All` status + empty N + overdue-toggle off ⇒ no filtering (all reminders shown).
