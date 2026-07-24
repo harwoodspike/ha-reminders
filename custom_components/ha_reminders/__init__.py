@@ -6,14 +6,14 @@ from datetime import date
 import logging
 from pathlib import Path
 
-from homeassistant.components.frontend import async_register_built_in_panel
+from homeassistant.components import frontend
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EVENT_HOMEASSISTANT_STARTED, Platform
-from homeassistant.core import Event, HomeAssistant
+from homeassistant.const import Platform
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.storage import Store
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.loader import async_get_integration
 
 from .const import DOMAIN
 
@@ -21,72 +21,40 @@ _LOGGER = logging.getLogger(__name__)
 _PLATFORMS: list[Platform] = [Platform.SENSOR]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
-_CARD_URL = "/ha_reminders/ha-reminders-card.js"
-_CARD_PATH = Path(__file__).parent / "ha-reminders-card.js"
-_DASHBOARD_URL_PATH = "reminders"
-
-
-async def _async_register_lovelace_resource(hass: HomeAssistant) -> None:
-    """Add the card to Lovelace's resource registry if not already present."""
-    try:
-        lovelace = hass.data.get("lovelace")
-        if lovelace is None:
-            _LOGGER.warning("ha-reminders: lovelace not found in hass.data")
-            return
-        resources = getattr(lovelace, "resources", None)
-        if resources is None:
-            _LOGGER.warning("ha-reminders: lovelace resources not found")
-            return
-        await resources.async_load()
-        if any(r.get("url") == _CARD_URL for r in resources.async_items()):
-            return
-        await resources.async_create_item({"res_type": "module", "url": _CARD_URL})
-        _LOGGER.info("Registered ha-reminders-card as Lovelace resource")
-    except Exception:  # noqa: BLE001
-        _LOGGER.exception("ha-reminders: failed to register Lovelace resource")
-
-
-async def _async_setup_dashboard(hass: HomeAssistant) -> None:
-    """Create the Reminders sidebar dashboard on first run."""
-    try:
-        store = Store(hass, 1, f"lovelace.{_DASHBOARD_URL_PATH}")
-        if await store.async_load() is None:
-            await store.async_save({
-                "config": {
-                    "title": "Reminders",
-                    "views": [{
-                        "title": "Reminders",
-                        "path": "default_view",
-                        "cards": [{"type": "custom:ha-reminders-card"}],
-                    }],
-                }
-            })
-            _LOGGER.info("ha-reminders: created default Reminders dashboard config")
-
-        async_register_built_in_panel(
-            hass,
-            "lovelace",
-            "Reminders",
-            "mdi:bell-check",
-            _DASHBOARD_URL_PATH,
-            {"mode": "storage"},
-            require_admin=False,
-        )
-    except Exception:  # noqa: BLE001
-        _LOGGER.exception("ha-reminders: failed to set up Reminders dashboard")
+_PANEL_URL = "/ha_reminders/ha-reminders-panel.js"
+_PANEL_PATH = Path(__file__).parent / "ha-reminders-panel.js"
+_PANEL_URL_PATH = "reminders"
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Register the custom Lovelace card as a frontend resource."""
+    """Register the Reminders panel JS and sidebar panel."""
     await hass.http.async_register_static_paths(
-        [StaticPathConfig(_CARD_URL, str(_CARD_PATH), cache_headers=False)]
+        [StaticPathConfig(_PANEL_URL, str(_PANEL_PATH), cache_headers=False)]
     )
 
-    async def _on_ha_started(_event: Event) -> None:
-        await _async_register_lovelace_resource(hass)
-        await _async_setup_dashboard(hass)
+    integration = await async_get_integration(hass, DOMAIN)
+    module_url = f"{_PANEL_URL}?v={integration.version}"
 
-    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, _on_ha_started)
+    try:
+        frontend.async_register_built_in_panel(
+            hass,
+            component_name="custom",
+            sidebar_title="Reminders",
+            sidebar_icon="mdi:bell-check",
+            frontend_url_path=_PANEL_URL_PATH,
+            require_admin=False,
+            config={
+                "_panel_custom": {
+                    "name": "ha-reminders-panel",
+                    "module_url": module_url,
+                    "embed_iframe": False,
+                    "trust_external": False,
+                }
+            },
+        )
+    except ValueError:
+        pass  # Panel already registered (e.g. integration reload).
+
     return True
 
 

@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
+from homeassistant.components import frontend
 from homeassistant.core import HomeAssistant
 from tests.common import MockConfigEntry  # noqa: TID251
 
@@ -80,3 +81,27 @@ async def test_remove_entry_cleans_up_sensor(hass: HomeAssistant) -> None:
 
     assert hass.states.get("sensor.oil_change") is None
     assert hass.config_entries.async_get_entry(entry.entry_id) is None
+
+
+async def test_panel_registered_after_setup(hass: HomeAssistant) -> None:
+    """The custom Reminders sidebar panel is registered after setup."""
+    entry = _make_entry()
+    await _setup(hass, entry)
+
+    panels = hass.data[frontend.DATA_PANELS]
+    assert "reminders" in panels
+
+    panel = panels["reminders"]
+    assert panel.sidebar_title == "Reminders"
+    assert panel.sidebar_icon == "mdi:bell-check"
+    assert panel.component_name == "custom"
+
+
+async def test_panel_module_url_is_versioned(hass: HomeAssistant) -> None:
+    """The panel module URL carries a version cache-buster query token."""
+    entry = _make_entry()
+    await _setup(hass, entry)
+
+    panel = hass.data[frontend.DATA_PANELS]["reminders"]
+    module_url = panel.config["_panel_custom"]["module_url"]
+    assert module_url.startswith("/ha_reminders/ha-reminders-panel.js?v=")
