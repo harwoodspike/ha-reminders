@@ -51,7 +51,17 @@ class HaRemindersPanel extends HTMLElement {
     };
     this._loadPersisted();
     this._onDocClick = this._onDocClick.bind(this);
-    this.shadowRoot.addEventListener('click', this._onDocClick);
+  }
+
+  connectedCallback() {
+    // Listen at document level so clicks anywhere outside the panel (e.g. the
+    // HA sidebar) also dismiss open popovers. Composed click events cross the
+    // shadow boundary, so composedPath() still reveals our internal targets.
+    document.addEventListener('click', this._onDocClick);
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener('click', this._onDocClick);
   }
 
   set hass(hass) {
@@ -259,6 +269,8 @@ class HaRemindersPanel extends HTMLElement {
     root.querySelectorAll('[data-filter]').forEach((el) => {
       el.addEventListener('change', () => this._onFilterChange());
     });
+    // Live filtering for the "Due within N days" number field (matches Search).
+    root.querySelector('[data-filter="withinDays"]').addEventListener('input', () => this._onFilterChange());
     root.querySelectorAll('[data-column]').forEach((el) => {
       el.addEventListener('change', () => {
         this._state.columns[el.dataset.column] = el.checked;
