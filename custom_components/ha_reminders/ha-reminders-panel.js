@@ -1,29 +1,19 @@
 /**
- * ha-reminders-card
+ * ha-reminders-panel
  *
- * Custom Lovelace card for the HA Reminders integration.
- * Auto-discovers all reminder sensor entities and renders
- * each row with a "Mark Done" button.
- *
- * Installation:
- *   1. Copy this file to /config/www/ha-reminders-card.js
- *   2. In HA: Settings > Dashboards > Resources > Add resource
- *      URL: /local/ha-reminders-card.js  Type: JavaScript module
- *   3. Add card to dashboard:
- *        type: custom:ha-reminders-card
- *        title: Reminders   # optional
+ * Full-page sidebar panel for the HA Reminders integration.
+ * Registered via panel_custom in __init__.py. HA sets the
+ * `hass`, `narrow`, `route`, and `panel` properties on this element.
+ * Lists all reminder sensors sorted by urgency, each with a Mark Done button.
  */
 
 const REMINDER_ATTRS = ['days_until', 'is_overdue', 'due_date', 'interval'];
 
-class HaRemindersCard extends HTMLElement {
+class HaRemindersPanel extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-  }
-
-  setConfig(config) {
-    this._config = config || {};
+    this._narrow = false;
   }
 
   set hass(hass) {
@@ -31,8 +21,17 @@ class HaRemindersCard extends HTMLElement {
     this._render();
   }
 
+  set narrow(value) {
+    this._narrow = value;
+    this._render();
+  }
+
+  set route(_value) {}
+
+  set panel(_value) {}
+
   // ---------------------------------------------------------------------------
-  // Helpers
+  // Data
   // ---------------------------------------------------------------------------
 
   _getReminderEntities() {
@@ -46,8 +45,12 @@ class HaRemindersCard extends HTMLElement {
     this._hass.callService('ha_reminders', 'mark_done', {}, { entity_id: entityId });
   }
 
+  _toggleMenu() {
+    this.dispatchEvent(new CustomEvent('hass-toggle-menu', { bubbles: true, composed: true }));
+  }
+
   // ---------------------------------------------------------------------------
-  // Rendering
+  // Text helpers
   // ---------------------------------------------------------------------------
 
   _statusText(attrs) {
@@ -63,12 +66,15 @@ class HaRemindersCard extends HTMLElement {
     return 'Last done: ' + d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
+  // ---------------------------------------------------------------------------
+  // Rendering
+  // ---------------------------------------------------------------------------
+
   _render() {
     const entities = this._getReminderEntities();
-    const title = this._config.title ?? 'Reminders';
 
-    const rows = entities.length === 0
-      ? `<p class="empty">No reminders configured.</p>`
+    const body = entities.length === 0
+      ? `<p class="empty">No reminders yet — add one from Settings → Devices &amp; Services.</p>`
       : entities.map((entity, i) => {
           const attrs = entity.attributes;
           const name = attrs.friendly_name || entity.entity_id;
@@ -88,14 +94,50 @@ class HaRemindersCard extends HTMLElement {
             </div>`;
         }).join('');
 
+    const menuButton = this._narrow
+      ? `<button class="menu" title="Open sidebar" aria-label="Open sidebar">☰</button>`
+      : '';
+
     this.shadowRoot.innerHTML = `
       <style>
-        ha-card { padding: 0 0 12px; }
-        .header {
-          padding: 16px 16px 4px;
-          font-size: 1.1em;
-          font-weight: 500;
-          color: var(--ha-card-header-color, var(--primary-text-color));
+        :host {
+          display: block;
+          height: 100%;
+          background: var(--primary-background-color, #fafafa);
+          color: var(--primary-text-color);
+        }
+        .bar {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          height: 56px;
+          padding: 0 16px;
+          background: var(--app-header-background-color, var(--primary-color));
+          color: var(--app-header-text-color, var(--text-primary-color, white));
+          font-size: 1.25em;
+          font-weight: 400;
+          box-sizing: border-box;
+        }
+        .menu {
+          background: none;
+          border: none;
+          color: inherit;
+          font-size: 1.2em;
+          cursor: pointer;
+          padding: 4px 8px;
+          line-height: 1;
+        }
+        .content {
+          max-width: 600px;
+          margin: 16px auto;
+          padding: 0 8px;
+        }
+        .card {
+          background: var(--ha-card-background, var(--card-background-color, white));
+          border-radius: var(--ha-card-border-radius, 12px);
+          box-shadow: var(--ha-card-box-shadow, 0 2px 4px rgba(0,0,0,0.1));
+          padding: 0 0 12px;
+          overflow: hidden;
         }
         hr {
           border: none;
@@ -105,7 +147,7 @@ class HaRemindersCard extends HTMLElement {
         .row {
           display: flex;
           align-items: center;
-          padding: 10px 16px;
+          padding: 12px 16px;
           gap: 12px;
         }
         .info {
@@ -114,9 +156,7 @@ class HaRemindersCard extends HTMLElement {
           flex-direction: column;
           gap: 2px;
         }
-        .name {
-          color: var(--primary-text-color);
-        }
+        .name { color: var(--primary-text-color); }
         .status {
           font-size: 0.85em;
           color: var(--secondary-text-color);
@@ -129,7 +169,7 @@ class HaRemindersCard extends HTMLElement {
           font-size: 0.8em;
           color: var(--disabled-text-color, #9e9e9e);
         }
-        button {
+        button[data-entity] {
           background: var(--primary-color);
           color: var(--text-primary-color, white);
           border: none;
@@ -139,34 +179,30 @@ class HaRemindersCard extends HTMLElement {
           cursor: pointer;
           white-space: nowrap;
         }
-        button:active { opacity: 0.75; }
+        button[data-entity]:active { opacity: 0.75; }
         .empty {
-          padding: 8px 16px;
+          padding: 16px;
           color: var(--secondary-text-color);
           font-style: italic;
         }
       </style>
-      <ha-card>
-        ${title ? `<div class="header">${title}</div>` : ''}
-        ${rows}
-      </ha-card>`;
+      <div class="bar">
+        ${menuButton}
+        <span>Reminders</span>
+      </div>
+      <div class="content">
+        <div class="card">
+          ${body}
+        </div>
+      </div>`;
+
+    const menu = this.shadowRoot.querySelector('button.menu');
+    if (menu) menu.addEventListener('click', () => this._toggleMenu());
 
     this.shadowRoot.querySelectorAll('button[data-entity]').forEach(btn => {
       btn.addEventListener('click', () => this._markDone(btn.dataset.entity));
     });
   }
-
-  // ---------------------------------------------------------------------------
-  // Card metadata
-  // ---------------------------------------------------------------------------
-
-  getCardSize() {
-    return Math.max(1, this._getReminderEntities().length);
-  }
-
-  static getStubConfig() {
-    return { title: 'Reminders' };
-  }
 }
 
-customElements.define('ha-reminders-card', HaRemindersCard);
+customElements.define('ha-reminders-panel', HaRemindersPanel);
